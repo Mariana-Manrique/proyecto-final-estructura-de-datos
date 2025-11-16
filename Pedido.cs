@@ -1,7 +1,7 @@
 //namespace Listas.Dominio;
 
 using System;
-
+//Esta es la clase pedido que contiene los atributos y metodos necesarios para manejar los pedidos de los clientes
 public class Pedido
 {
     // Constantes para el estado del pedido
