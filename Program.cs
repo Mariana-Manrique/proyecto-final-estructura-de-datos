@@ -1,0 +1,383 @@
+//namespace Listas;
+
+//using Listas.Dominio;
+//using Listas.Servicios;
+using System;
+
+class Program
+{
+    private static GestorPrincipal _gestorPrincipal = new GestorPrincipal();
+    private static GestorPedidos _gestorPedidos = new GestorPedidos(_gestorPrincipal);
+
+    static void Main(string[] args)
+    {
+        // RNF-04: Datos de ejemplo para empezar
+        SetupDatosEjemplo();
+
+        MostrarMenuPrincipal();
+    }
+
+    private static void SetupDatosEjemplo()
+    {
+        // Crear Restaurante de ejemplo
+        var r1 = new Restaurante("1234567890", "El Buen Sabor", "Juan Pérez", "3001234567", "Calle Falsa 123");
+        _gestorPrincipal.CrearRestaurante(r1);
+
+        // Agregar Cliente de ejemplo
+        var c1 = new Cliente("1001", "Ana Gomez", "3109876543", "ana@mail.com");
+        r1.Clientes.Agregar(c1);
+
+        // Agregar Platos de ejemplo
+        r1.Menu.Agregar(new Plato("P01", "Hamburguesa Clásica", "Doble carne y queso", 15.00m));
+        r1.Menu.Agregar(new Plato("P02", "Papas Fritas", "Porción grande", 5.00m));
+    }
+
+    private static void MostrarMenuPrincipal()
+    {
+        // Implementación básica del Menú Navegable (RF-09)
+        bool salir = false;
+        while (!salir)
+        {
+            Console.Clear();
+            Console.WriteLine("=====================================");
+            Console.WriteLine(" 🍴 SISTEMA DE GESTIÓN DE RESTAURANTE");
+            Console.WriteLine("=====================================");
+            Console.WriteLine("1. Gestión de Restaurantes");
+            Console.WriteLine("2. Gestión de Menú y Clientes (Requiere seleccionar Restaurante)");
+            Console.WriteLine("3. Gestión de Pedidos y Reportes");
+            Console.WriteLine("0. Salir");
+            Console.Write("\nSeleccione una opción: ");
+
+            string opcion = Console.ReadLine();
+
+            switch (opcion)
+            {
+                case "1":
+                   // MenuGestionRestaurantes(); // revisarlo
+                    break;
+                case "2":
+                    // Primero pide el NIT del restaurante a gestionar
+                    GestionarMenuYClientes();
+                    break;
+                case "3":
+                    MenuGestionPedidos();
+                    break;
+                case "0":
+                    salir = true;
+                    break;
+                default:
+                    Console.WriteLine("Opción no válida.");
+                    Pausar();
+                    break;
+            }
+        }
+    }
+
+    // [Implementar métodos: MenuGestionRestaurantes, GestionarMenuYClientes, MenuGestionPedidos, etc.]
+    
+    // Método de utilidad para pausar la consola (RNF-03)
+    private static void Pausar()
+    {
+        Console.WriteLine("\nPresione cualquier tecla para continuar...");
+        Console.ReadKey();
+    }
+
+    private static void GestionarMenuYClientes()
+{
+    // Función para seleccionar el restaurante a gestionar
+    Console.WriteLine("\n--- SELECCIÓN DE RESTAURANTE ---");
+    Console.Write("Ingrese el NIT del Restaurante a gestionar: ");
+    string nit = Console.ReadLine();
+
+    Restaurante restaurante = _gestorPrincipal.ObtenerRestaurantePorNit(nit);
+
+    if (restaurante == null)
+    {
+        Console.WriteLine($"\nRestaurante con NIT {nit} no encontrado.");
+        Pausar();
+        return;
+    }
+
+    Console.WriteLine($"\n--- Gestionando: {restaurante.Nombre} ---");
+    MenuGestionClientesYPlatos(restaurante);
+}
+
+private static void MenuGestionClientesYPlatos(Restaurante restaurante)
+{
+    bool regresar = false;
+    while (!regresar)
+    {
+        Console.Clear();
+        Console.WriteLine($"\n== GESTIÓN de {restaurante.Nombre} (NIT: {restaurante.Nit}) ==");
+        Console.WriteLine("1. Gestión de Clientes (RF-02)");
+        Console.WriteLine("2. Gestión de Platos del Menú (RF-03)");
+        Console.WriteLine("0. Regresar al Menú Principal");
+        Console.Write("\nSeleccione una opción: ");
+
+        string opcion = Console.ReadLine();
+
+        switch (opcion)
+        {
+            case "1":
+                MenuClientes(restaurante);
+                break;
+            case "2":
+                MenuPlatos(restaurante);
+                break;
+            case "0":
+                regresar = true;
+                break;
+            default:
+                Console.WriteLine("Opción no válida.");
+                Pausar();
+                break;
+        }
+    }
+}
+// ----------------------------------------------------------------------
+// Métodos de navegación específicos
+// ----------------------------------------------------------------------
+
+private static void MenuClientes(Restaurante restaurante)
+{
+    bool regresar = false;
+    while (!regresar)
+    {
+        Console.Clear();
+        Console.WriteLine($"\n== GESTIÓN DE CLIENTES en {restaurante.Nombre} ==");
+        Console.WriteLine("1. Crear Cliente (RF-02)");
+        Console.WriteLine("2. Listar Clientes (RF-02)");
+        Console.WriteLine("3. Editar Cliente (RF-02)");
+        Console.WriteLine("4. Borrar Cliente (RF-02, RF-08)");
+        Console.WriteLine("0. Regresar");
+        Console.Write("\nSeleccione una opción: ");
+
+        string opcion = Console.ReadLine();
+
+        switch (opcion)
+        {
+            case "1":
+                // Llama al método de Creación
+                // (Debes implementar un método para leer datos del cliente)
+                break; 
+            case "2":
+                _gestorPrincipal.ListarClientes(restaurante); // Llamada al Gestor Principal/Cliente
+                Pausar();
+                break;
+            case "3":
+                // Llama al método de Edición
+                break;
+            case "4":
+                // Llama al método de Borrado Seguro
+                break;
+            case "0":
+                regresar = true;
+                break;
+            default:
+                Console.WriteLine("Opción no válida.");
+                Pausar();
+                break;
+        }
+    }
+}
+
+private static void MenuPlatos(Restaurante restaurante)
+{
+    bool regresar = false;
+    while (!regresar)
+    {
+        Console.Clear();
+        Console.WriteLine($"\n== GESTIÓN DE PLATOS en {restaurante.Nombre} ==");
+        Console.WriteLine("1. Crear Plato (RF-03)");
+        Console.WriteLine("2. Listar Platos (RF-03)");
+        Console.WriteLine("3. Editar Plato (RF-03)");
+        Console.WriteLine("4. Borrar Plato (RF-03, RF-08)");
+        Console.WriteLine("0. Regresar");
+        Console.Write("\nSeleccione una opción: ");
+        
+        // Simplemente como ejemplo, para no hacer la implementación completa del menú.
+        // Aquí iría el switch con las llamadas a GestorMenu.
+        
+        Pausar();
+        regresar = true; // Salida temporal para continuar con la implementación de lógica
+    }
+}
+
+private static void MenuGestionPedidos()
+{
+    Console.WriteLine("\n--- GESTIÓN DE PEDIDOS ---");
+    Console.Write("Ingrese el NIT del Restaurante: ");
+    string nit = Console.ReadLine();
+
+    Restaurante restaurante = _gestorPrincipal.ObtenerRestaurantePorNit(nit);
+
+    if (restaurante == null)
+    {
+        Console.WriteLine("\nRestaurante no encontrado.");
+        Pausar();
+        return;
+    }
+
+    bool regresar = false;
+    while (!regresar)
+    {
+        Console.Clear();
+        Console.WriteLine($"\n== GESTIÓN DE PEDIDOS en {restaurante.Nombre} ==");
+        Console.WriteLine("1. Tomar Nuevo Pedido (RF-04, RF-05)");
+        Console.WriteLine("2. Despachar Siguiente Pedido (RF-06)");
+        Console.WriteLine("3. Reporte de Ganancias del Día (RF-07)");
+        Console.WriteLine("4. Reporte de Platos Servidos Recientes (RF-07)");
+        Console.WriteLine("0. Regresar");
+        Console.Write("\nSeleccione una opción: ");
+
+        string opcion = Console.ReadLine();
+
+        switch (opcion)
+        {
+            case "1":
+                FlujoTomarPedido(restaurante);
+                Pausar();
+                break;
+            case "2":
+                _gestorPedidos.DespacharSiguientePedido(restaurante.Nit);
+                Pausar();
+                break;
+            case "3":
+                _gestorPedidos.ReporteGananciasDelDia(restaurante.Nit);
+                Pausar();
+                break;
+            case "4":
+                _gestorPedidos.ReportePlatosServidosRecientes(restaurante.Nit);
+                Pausar();
+                break;
+            case "0":
+                regresar = true;
+                break;
+            default:
+                Console.WriteLine("Opción no válida.");
+                Pausar();
+                break;
+        }
+    }
+}
+
+private static void FlujoTomarPedido(Restaurante restaurante)
+{
+    Console.WriteLine("\n--- INICIO DE PEDIDO ---");
+    Console.Write("Ingrese la Cédula del Cliente: ");
+    string cedula = Console.ReadLine();
+    
+    // Validar existencia de cliente
+    Cliente cliente = ObtenerClientePorCedula(restaurante, cedula);
+    if (cliente == null)
+    {
+        Console.WriteLine("Error: Cliente no encontrado o Cédula incorrecta.");
+        return;
+    }
+
+    // Usaremos una Lista Enlazada temporal para guardar los ítems antes de confirmar
+    var itemsPedidoTemp = new ListaEnlazada<PlatoPedido>();
+    bool agregarMas = true;
+    
+    while (agregarMas)
+    {
+        Console.Clear();
+        Console.WriteLine($"\n-- Agregando Ítems para {cliente.NombreCompleto} --");
+        
+        // RF-04: Ver menú
+        new GestorMenu(_gestorPrincipal).ListarPlatos(restaurante); 
+        
+        Console.Write("\nIngrese el Código del Plato a ordenar (o 'FIN' para terminar): ");
+        string codigo = Console.ReadLine().ToUpper();
+
+        if (codigo == "FIN")
+        {
+            agregarMas = false;
+            break;
+        }
+        
+        // Buscar el plato en el menú del restaurante para obtener precio y validar
+        Plato platoSeleccionado = ObtenerPlatoPorCodigo(restaurante, codigo); 
+        
+        if (platoSeleccionado == null)
+        {
+            Console.WriteLine("Código de plato no válido. Intente de nuevo.");
+            Pausar();
+            continue;
+        }
+
+        Console.Write($"Ingrese la cantidad de '{platoSeleccionado.Nombre}': ");
+        if (!int.TryParse(Console.ReadLine(), out int cantidad) || cantidad <= 0)
+        {
+            Console.WriteLine("Cantidad no válida. Debe ser un número entero mayor que cero.");
+            Pausar();
+            continue;
+        }
+
+        // Crear el item y agregarlo a la lista temporal
+        var item = new PlatoPedido(platoSeleccionado.Codigo, cantidad, platoSeleccionado.Precio);
+        itemsPedidoTemp.Agregar(item);
+        
+        Console.WriteLine($"'{platoSeleccionado.Nombre}' x{cantidad} agregado.");
+        Pausar();
+    }
+    
+    // Si no se agregaron ítems
+    if (itemsPedidoTemp.Cantidad == 0)
+    {
+        Console.WriteLine("El pedido fue cancelado al no agregar ítems.");
+        return;
+    }
+
+    // Calcular Total Previo (RF-04)
+    decimal totalPrevio = 0;
+    var actualItem = itemsPedidoTemp.Cabeza;
+    while(actualItem != null)
+    {
+        totalPrevio += actualItem.Valor.Subtotal;
+        actualItem = actualItem.Siguiente;
+    }
+
+    Console.WriteLine($"\nRESUMEN DEL PEDIDO: Total a pagar: ${totalPrevio:N2}");
+    Console.Write("¿Desea confirmar el pedido? (S/N): ");
+    
+    if (Console.ReadLine().ToUpper() == "S")
+    {
+        // RF-05: Encolar Pedido
+        _gestorPedidos.TomarYConfirmarPedido(restaurante.Nit, cedula, itemsPedidoTemp);
+    }
+    else
+    {
+        Console.WriteLine("Pedido cancelado.");
+    }
+}
+
+// Métodos de utilidad para Program.cs
+private static Cliente ObtenerClientePorCedula(Restaurante restaurante, string cedula)
+{
+    var actual = restaurante.Clientes.Cabeza;
+    while (actual != null)
+    {
+        if (actual.Valor.Cedula == cedula)
+        {
+            return actual.Valor;
+        }
+        actual = actual.Siguiente;
+    }
+    return null;
+}
+
+private static Plato ObtenerPlatoPorCodigo(Restaurante restaurante, string codigo)
+{
+    var actual = restaurante.Menu.Cabeza;
+    while (actual != null)
+    {
+        if (actual.Valor.Codigo == codigo)
+        {
+            return actual.Valor;
+        }
+        actual = actual.Siguiente;
+    }
+    return null;
+}
+}
