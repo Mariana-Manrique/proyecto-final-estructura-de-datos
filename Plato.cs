@@ -1,7 +1,7 @@
 //namespace Listas.Dominio;
 
 using System;
-
+//esta es la clase plato que contiene los atributos y metodos necesarios para manejar los platos del menu
 public class Plato
 {
     // Atributos clave
