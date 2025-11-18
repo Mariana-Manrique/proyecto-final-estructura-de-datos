@@ -169,7 +169,7 @@ private static void ListarRestaurantes()
 
     {
 
-        Console.WriteLine($"{r.Nit} | {r.Nombre} | {r.Dueño}");
+        Console.WriteLine($"{r.Nit} | {r.Nombre}");
 
     });
 
@@ -199,8 +199,6 @@ private static void EditarRestauranteDesdeConsola()
 
     }
 
-
-
     Console.Write("Nuevo nombre (enter para mantener): ");
 
     string nuevoNom = Console.ReadLine();
@@ -215,12 +213,7 @@ private static void EditarRestauranteDesdeConsola()
 
     string nuevoDueño = Console.ReadLine();
 
-    if (!string.IsNullOrWhiteSpace(nuevoDueño))
-
-        restaurante.Dueño = nuevoDueño;
-
-
-
+    
     Console.Write("Nuevo celular (enter para mantener): ");
 
     string nuevoCel = Console.ReadLine();

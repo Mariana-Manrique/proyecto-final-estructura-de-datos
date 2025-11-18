@@ -190,4 +190,14 @@ public bool EliminarPorValor(T valor)
     return false; // No se encontró el valor
 }
 
+public void Recorrer(Action<T> accion)
+{
+    Nodo<T> actual = cabeza; // Asumo que 'cabeza' es el primer nodo (puede ser 'this.cabeza' si es privado)
+    while (actual != null)
+    {
+        // Ejecuta la función (lambda) que se pasó como argumento (la que imprime en Console.WriteLine)
+        accion(actual.Valor); 
+        actual = actual.Siguiente; // Mueve al siguiente nodo
+    }
+}
 }

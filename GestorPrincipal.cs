@@ -31,26 +31,36 @@ public class GestorPrincipal
         return false;
     }
 
-    public void CrearRestaurante(Restaurante nuevoRestaurante)
+   // Implementación corregida en GestorPrincipal.cs para que retorne bool
+public bool CrearRestaurante(Restaurante nuevoRestaurante)
+{
+    // 1. Validar si ya existe
+    if (ExisteRestaurante(nuevoRestaurante.Nit))
     {
-        if (ExisteRestaurante(nuevoRestaurante.Nit))
-        {
-            Console.WriteLine($"Error: Ya existe un restaurante con el NIT {nuevoRestaurante.Nit}."); // [cite: 19]
-            return;
-        }
-        
-        // Otras validaciones (campos vacíos, celular 10 dígitos)
-        if (string.IsNullOrWhiteSpace(nuevoRestaurante.Nit) || nuevoRestaurante.Celular.Length != 10) // [cite: 19]
-        {
-             Console.WriteLine("Error de validación. Revise los campos (NIT no vacío, Celular 10 dígitos).");
-             return;
-        }
-
-
-        Restaurantes.Agregar(nuevoRestaurante);
-        Console.WriteLine($"Restaurante '{nuevoRestaurante.Nombre}' creado con éxito.");
+        Console.WriteLine($"Error: Ya existe un restaurante con el NIT {nuevoRestaurante.Nit}.");
+        return false; // Retorna FALSE si hay NIT duplicado
     }
     
+    // 2. Otras validaciones (campos vacíos, celular 10 dígitos)
+    // Asumo que la propiedad del dueño es 'Dueno' o 'Dueño'
+    if (string.IsNullOrWhiteSpace(nuevoRestaurante.Nit) || 
+        string.IsNullOrWhiteSpace(nuevoRestaurante.Nombre) || 
+        string.IsNullOrWhiteSpace(nuevoRestaurante.Dueno) || 
+        nuevoRestaurante.Celular == null || nuevoRestaurante.Celular.Length != 10)
+    {
+         Console.WriteLine("Error de validación. Revise los campos (NIT, Nombre y Dueño no vacíos, Celular 10 dígitos).");
+         return false; // Retorna FALSE si la validación falla
+    }
+
+    // 3. Crear el restaurante
+    Restaurantes.Agregar(nuevoRestaurante);
+    
+    // NOTA: Los mensajes de éxito/error se muestran ahora en Program.cs,
+    // pero se deja este mensaje por si la función se llama desde otro lugar.
+    // Console.WriteLine($"Restaurante '{nuevoRestaurante.Nombre}' creado con éxito."); 
+    
+    return true; // Retorna TRUE si la creación fue exitosa
+}
     public Restaurante ObtenerRestaurantePorNit(string nit)
     {
         var actual = Restaurantes.Cabeza;
@@ -144,43 +154,48 @@ public class GestorPrincipal
     Console.WriteLine($"Restaurante con NIT {nit} actualizado con éxito.");
 }
 
-public void BorrarRestaurante(string nit)
+// Sustituir el método BorrarRestaurante actual en GestorPrincipal.cs
+public bool BorrarRestaurante(string nit)
 {
-    var restaurante = ObtenerRestaurantePorNit(nit);
+    // Usamos BuscarRestaurante (o ObtenerRestaurantePorNit) para encontrar el objeto
+    var restaurante = BuscarRestaurante(nit); 
     
     if (restaurante == null)
     {
-        Console.WriteLine($"Error: Restaurante con NIT {nit} no encontrado.");
-        return;
+        // El restaurante no existe, no se puede borrar
+        // El mensaje de error lo imprime Program.cs ("No se pudo borrar...")
+        return false; 
     }
 
-    // ⭐ REGLA DE NEGOCIO (RF-06): Antes de borrar, se debe validar que
-    // el restaurante no tenga pedidos PENDIENTES.
-    // **Nota:** Como no tenemos acceso al GestorPedidos aquí de forma simple, 
-    // asumiremos temporalmente que se puede borrar, o implementamos una validación simple 
-    // si el GestorPrincipal tiene la lógica de Pedidos (lo cual no parece ser el caso 
-    // según el patrón de diseño).
-    
-    // **Si tienes un GestorPedidos, la implementación ideal sería:**
-    /*
-    if (_gestorPedidos.TienePedidosPendientes(nit))
+    // ⭐ REGLA DE NEGOCIO (RF-06): Validar si tiene pedidos pendientes.
+    // Esto requiere acceder a la lista de pedidos del restaurante (ColaPedidosPendientes).
+    // Asumo que la propiedad es pública y accesible.
+    if (!restaurante.ColaPedidosPendientes.EstaVacia()) 
     {
-        Console.WriteLine($"Error: El restaurante '{restaurante.Nombre}' no puede borrarse. Tiene pedidos pendientes.");
-        return;
+        // El restaurante tiene pedidos pendientes (no vacío), no se puede borrar.
+        // El mensaje de error lo imprime Program.cs.
+        return false;
     }
-    */
-    
-    // Asumiendo que tu ListaEnlazada<T> tiene un método para eliminar un nodo por su valor:
-    // (Si no tienes este método, necesitas agregarlo a ListaEnlazada.cs)
+
+    // Si no tiene pedidos pendientes y existe, procedemos a borrarlo de la lista principal.
+    // Asumimos que la clase ListaEnlazada<T> tiene un método para eliminar un nodo por su valor.
     if (Restaurantes.EliminarPorValor(restaurante)) 
     {
-        Console.WriteLine($"Restaurante '{restaurante.Nombre}' (NIT: {nit}) borrado con éxito.");
+        // Borrado exitoso
+        return true; 
     }
-    else
-    {
-        // Esto podría ocurrir si EliminarPorValor falla o la lista no está bien implementada.
-        Console.WriteLine($"Error al intentar borrar el restaurante con NIT: {nit}.");
-    }
+    
+    // Falló por alguna razón (e.g., error en la lista enlazada)
+    return false;
+}
+
+// Añadir este método a la clase GestorPrincipal.cs
+public Restaurante BuscarRestaurante(string nit)
+{
+    // Este método simplemente llama al método ObtenerRestaurantePorNit,
+    // que ya contiene la lógica de búsqueda. Esto resuelve el error de
+    // compilación en Program.cs sin duplicar la lógica de recorrido.
+    return ObtenerRestaurantePorNit(nit);
 }
 
 }
