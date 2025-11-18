@@ -156,69 +156,38 @@ public class ListaEnlazada<T> {
         actual.Siguiente = nuevoNodo;
     }
     
+// EN ListaEnlazada.cs
+public bool EliminarPorValor(T valor)
+{
+    if (cabeza == null)
+    {
+        return false;
+    }
 
-    /*public void Eliminar(Persona valor) {
-        
-        if (cabeza == null) 
-        {
-            return; 
-        }
-
+    // Caso 1: El nodo a borrar es la cabeza
+    if (cabeza.Valor.Equals(valor)) 
+    {
+        cabeza = cabeza.Siguiente;
+        if (cabeza == null) ultimo = null; // Si se queda vacía
         cantidad--;
+        return true;
+    }
 
-        if (cabeza.Valor.Cedula == valor.Cedula) 
-        {
-            cabeza = cabeza.Siguiente;
-            return;
-        }
-
-        Nodo actual = cabeza;
-        while (actual.Siguiente != null) 
-        {
-            if (actual.Siguiente.Valor.Cedula == valor.Cedula)
-            {
-                actual.Siguiente = actual.Siguiente.Siguiente;
-                return;
-            }
-            actual = actual.Siguiente;
-        }
-        
-    }*/
-
-    /*public void EliminarDuplicados() 
+    // Caso 2: Buscar en el resto de la lista
+    Nodo<T> actual = cabeza;
+    while (actual.Siguiente != null)
     {
-        if (cabeza == null) {
-            return;
-        }
-        Nodo<T> actual = cabeza;
-        while (actual != null) {
-            Nodo<T> comparador = actual;
-            while (comparador.Siguiente != null) 
-            {
-                if (actual.Valor == comparador.Siguiente.Valor) 
-                {
-                    comparador.Siguiente = comparador.Siguiente.Siguiente;
-                } else {
-                    comparador = comparador.Siguiente;
-                }
-            }
-            actual = actual.Siguiente;
-        }
-    }*/
-
-    /*public int ContarRepetidos(Persona valor)
-    {
-        int contador = 0;
-        Nodo<T> actual = cabeza;
-        while(actual.Siguiente != null)
+        if (actual.Siguiente.Valor.Equals(valor))
         {
-            if(actual.Valor == valor)
-                contador++;
-            actual = actual.Siguiente;
+            actual.Siguiente = actual.Siguiente.Siguiente;
+            if (actual.Siguiente == null) ultimo = actual; // Si se borra el último
+            cantidad--;
+            return true;
         }
-        if(actual.Valor == valor)
-                contador++;
-        return contador;
-    }*/
+        actual = actual.Siguiente;
+    }
+
+    return false; // No se encontró el valor
+}
 
 }

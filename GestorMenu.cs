@@ -85,10 +85,12 @@ public class GestorMenu
 
     public void ListarPlatos(Restaurante restaurante)
 {
-    Console.WriteLine($"\n--- MENÚ DE PLATOS ({restaurante.Menu.Cantidad} en total) ---");
+    Console.Clear();
+    Console.WriteLine($"\n--- MENÚ DE PLATOS de {restaurante.Nombre} ---");
+    
     if (restaurante.Menu.Cabeza == null)
     {
-        Console.WriteLine("El menú está vacío.");
+        Console.WriteLine("El menú está vacío. No hay platos registrados.");
         return;
     }
     
@@ -96,7 +98,10 @@ public class GestorMenu
     int indice = 1;
     while (actual != null)
     {
-        Console.WriteLine($"{indice}. {actual.Valor}"); 
+        var p = actual.Valor;
+        // Asumiendo que Plato.ToString() o la impresión directa son suficientes
+        Console.WriteLine($"{indice}. [{p.Codigo}] {p.Nombre} - ${p.Precio:N2}"); 
+        Console.WriteLine($"   Descripción: {p.Descripcion}");
         actual = actual.Siguiente;
         indice++;
     }
@@ -143,4 +148,67 @@ public bool EditarPlato(string nitRestaurante, string codigoPlato, string nuevoN
     Console.WriteLine($"Plato {codigoPlato} editado con éxito.");
     return true;
 }
+
+public void CrearPlatoDesdeConsola(Restaurante restaurante)
+{
+    Console.Clear();
+    Console.WriteLine($"\n-- CREAR NUEVO PLATO para el menú de {restaurante.Nombre} --");
+
+    Console.Write("Ingrese Código del plato (único): ");
+    string codigo = Console.ReadLine()?.Trim();
+    
+    // 1. Validar unicidad y que no esté vacío
+    if (string.IsNullOrWhiteSpace(codigo) || ExistePlato(restaurante, codigo)) 
+    {
+        string mensaje = string.IsNullOrWhiteSpace(codigo) ? 
+                         "Error: El código no puede estar vacío." : 
+                         $"Error: Ya existe un plato con el código {codigo} en el menú.";
+        Console.WriteLine(mensaje);
+        return;
+    }
+
+    Console.Write("Ingrese Nombre del plato: ");
+    string nombre = Console.ReadLine()?.Trim();
+    
+    Console.Write("Ingrese Descripción del plato: ");
+    string descripcion = Console.ReadLine()?.Trim();
+    
+    Console.Write("Ingrese Precio del plato (debe ser > 0): ");
+    string precioStr = Console.ReadLine()?.Trim();
+
+    // 2. Validar que el precio sea un número positivo
+    if (!decimal.TryParse(precioStr, out decimal precio) || precio <= 0)
+    {
+        Console.WriteLine("Error de validación: El precio debe ser un número positivo (> 0).");
+        return;
+    }
+
+    // 3. Validación de nombre no vacío
+    if (string.IsNullOrWhiteSpace(nombre))
+    {
+        Console.WriteLine("Error: El nombre del plato no puede estar vacío.");
+        return;
+    }
+    
+    // 4. Creación y adición
+    var nuevoPlato = new Plato(codigo, nombre, descripcion, precio);
+    restaurante.Menu.Agregar(nuevoPlato); // Agregar a la ListaEnlazada<Plato> del restaurante
+
+    Console.WriteLine($"Plato '{nombre}' creado y agregado al menú con éxito.");
+}
+
+public bool ExistePlato(Restaurante restaurante, string codigo)
+{
+    var actual = restaurante.Menu.Cabeza;
+    while (actual != null)
+    {
+        if (actual.Valor.Codigo == codigo)
+        {
+            return true;
+        }
+        actual = actual.Siguiente;
+    }
+    return false;
+}
+
 }
