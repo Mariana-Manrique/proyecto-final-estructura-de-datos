@@ -1,17 +1,15 @@
-//namespace Listas.Dominio;
-
 using System;
 
 public class Cliente
 {
-    // Atributos clave
-    public string Cedula { get; set; } // Única [cite: 21, 22]
-    public string NombreCompleto { get; set; } // [cite: 21]
-    public string Celular { get; set; } // 10 dígitos [cite: 21, 22]
-    public string Email { get; set; } // Formato válido [cite: 21, 22]
+    
+    public string Cedula { get; set; } 
+    public string NombreCompleto { get; set; } 
+    public string Celular { get; set; } 
+    public string Email { get; set; } 
 
-    // Historial de pedidos del cliente (Lista Enlazada)
-    public ListaEnlazada<Pedido> HistorialPedidos { get; private set; } // [cite: 10]
+    
+    public ListaEnlazada<Pedido> HistorialPedidos { get; private set; } 
 
     public Cliente(string cedula, string nombre, string celular, string email)
     {
@@ -22,7 +20,7 @@ public class Cliente
         HistorialPedidos = new ListaEnlazada<Pedido>();
     }
 
-   // [cite_start]// Verifica si el cliente tiene pedidos PENDIENTES [cite: 48]
+   
     public bool TienePedidosPendientes()
     {
         var actual = HistorialPedidos.Cabeza;

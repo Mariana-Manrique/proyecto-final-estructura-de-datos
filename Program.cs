@@ -545,6 +545,12 @@ private static void MenuClientes(Restaurante restaurante)
                 _gestorCliente.ListarClientes(restaurante);
 
                 break;
+            case "3":
+                EditarClienteDesdeConsola(restaurante); // Llama al nuevo método
+                break;
+            case "4":
+                BorrarClienteDesdeConsola(restaurante); // Llama al nuevo método
+            break;
 
             case "0":
 
@@ -667,73 +673,60 @@ private static void CrearClienteDesdeConsola(Restaurante restaurante)
 
 
 private static void EditarClienteDesdeConsola(Restaurante restaurante)
-
 {
-
     Console.Clear();
-
-    Console.WriteLine($"\n== EDITAR CLIENTE en {restaurante.Nombre} ==");
-
-
-
-    Console.Write("Ingrese la cédula del cliente a editar: ");
-
-    string cedula = Console.ReadLine();
-
-
-
-    // Usamos el GestorCliente que ya creaste
-
-    Console.Write("Nuevo nombre completo: ");
-
+    Console.WriteLine($"\n-- EDITAR CLIENTE en {restaurante.Nombre} --");
+    
+    Console.Write("Ingrese Cédula del cliente a editar: ");
+    string cedula = Console.ReadLine()?.Trim();
+    
+    // Si el usuario presiona Enter, usamos el valor actual para Nombre, Celular y Email.
+    // Aunque el gestor pide los 3 parámetros, solo los que no estén vacíos
+    // serán validados y usados por la lógica que implementaste en GestorCliente.cs.
+    
+    Console.Write("Nuevo Nombre Completo (enter para mantener): ");
     string nuevoNombre = Console.ReadLine();
 
-
-
-    Console.Write("Nuevo celular (10 dígitos): ");
-
+    Console.Write("Nuevo Celular (10 dígitos, enter para mantener): ");
     string nuevoCelular = Console.ReadLine();
-
-
-
-    Console.Write("Nuevo email: ");
-
+    
+    Console.Write("Nuevo Email (enter para mantener): ");
     string nuevoEmail = Console.ReadLine();
 
-
-
-    _gestorCliente.EditarCliente(restaurante.Nit, cedula, nuevoNombre, nuevoCelular, nuevoEmail);
-
-    Pausar();
-
+    // Llamamos al método en GestorCliente
+    if (_gestorCliente.EditarCliente(restaurante.Nit, cedula, nuevoNombre, nuevoCelular, nuevoEmail))
+    {
+        // El mensaje de éxito ya está en GestorCliente.cs, pero podemos reforzarlo.
+        // Console.WriteLine("Edición completada con éxito.");
+    }
+    // El mensaje de error lo imprime GestorCliente si el cliente no existe o falla validación.
+    
+    Pausar(); 
 }
 
 
 
 private static void BorrarClienteDesdeConsola(Restaurante restaurante)
-
 {
-
     Console.Clear();
+    Console.WriteLine($"\n-- BORRAR CLIENTE en {restaurante.Nombre} --");
+    
+    Console.Write("Ingrese Cédula del cliente a borrar: ");
+    string cedula = Console.ReadLine()?.Trim();
 
-    Console.WriteLine($"\n== BORRAR CLIENTE en {restaurante.Nombre} ==");
-
-
-
-    Console.Write("Ingrese la cédula del cliente a borrar: ");
-
-    string cedula = Console.ReadLine();
-
-
-
-    // Usa el borrado seguro (valida pedidos pendientes)
-
-    _gestorCliente.BorrarClienteSeguro(restaurante.Nit, cedula);
-
-
-
+    // Llamamos al método seguro en GestorCliente
+    if (_gestorCliente.BorrarClienteSeguro(restaurante.Nit, cedula))
+    {
+        // El mensaje de éxito ya está en GestorCliente.cs
+        // Console.WriteLine("Cliente borrado con éxito.");
+    }
+    else
+    {
+        // El mensaje de error lo imprime GestorCliente si no existe o tiene pedidos pendientes.
+        Console.WriteLine("Operación de borrado cancelada o fallida.");
+    }
+    
     Pausar();
-
 }
 
 
@@ -778,6 +771,14 @@ private static void MenuPlatos(Restaurante restaurante)
 
                 _gestorMenu.ListarPlatos(restaurante);
 
+                break;
+
+            case "3":
+                EditarPlatoDesdeConsola(restaurante); // Llama al nuevo método
+                break;
+
+            case "4":
+                BorrarPlatoDesdeConsola(restaurante); // Llama al nuevo método
                 break;
 
             case "0":
@@ -951,89 +952,72 @@ private static void ListarPlatosRestaurante(Restaurante restaurante)
 
 
 private static void EditarPlatoDesdeConsola(Restaurante restaurante)
-
 {
-
     Console.Clear();
-
-    Console.WriteLine($"\n== EDITAR PLATO en {restaurante.Nombre} ==");
-
-
-
-    Console.Write("Código del plato a editar: ");
-
-    string codigo = Console.ReadLine();
-
-
-
-    Console.Write("Nuevo nombre: ");
-
+    Console.WriteLine($"\n-- EDITAR PLATO en el Menú de {restaurante.Nombre} --");
+    
+    // 1. Solicitamos el código del plato
+    Console.Write("Ingrese Código del plato a editar: ");
+    string codigo = Console.ReadLine()?.Trim();
+    
+    // 2. Solicitamos los nuevos datos (opcionales)
+    Console.Write("Nuevo Nombre (enter para mantener): ");
     string nuevoNombre = Console.ReadLine();
 
+    Console.Write("Nueva Descripción (enter para mantener): ");
+    string nuevaDesc = Console.ReadLine();
+    
+    Console.Write("Nuevo Precio (enter para mantener, 0 para no cambiar): ");
+    string precioStr = Console.ReadLine();
+    decimal nuevoPrecio = 0;
 
-
-    Console.Write("Nueva descripción: ");
-
-    string nuevaDescripcion = Console.ReadLine();
-
-
-
-    Console.Write("Nuevo precio: ");
-
-    string precioTexto = Console.ReadLine();
-
-
-
-    if (!decimal.TryParse(precioTexto, out decimal nuevoPrecio))
-
+    // Validación y conversión del precio
+    if (!string.IsNullOrWhiteSpace(precioStr) && !decimal.TryParse(precioStr, out nuevoPrecio))
     {
-
-        Console.WriteLine("Error: El precio debe ser un número válido.");
-
+        Console.WriteLine("Error: Formato de precio inválido.");
         Pausar();
-
         return;
-
     }
 
-
-
-    // Usamos el GestorMenu para aplicar reglas de negocio
-
-    _gestorMenu.EditarPlato(restaurante.Nit, codigo, nuevoNombre, nuevaDescripcion, nuevoPrecio);
-
+    // 3. Llamamos al GestorMenu para aplicar la edición
+    // Usamos las validaciones en GestorMenu.cs
+    if (_gestorMenu.EditarPlato(restaurante.Nit, codigo, nuevoNombre, nuevaDesc, nuevoPrecio))
+    {
+        Console.WriteLine("\n¡Plato actualizado con éxito!");
+    }
+    else
+    {
+        // El error específico lo muestra GestorMenu.cs
+        Console.WriteLine("\nNo se pudo editar el plato (código no encontrado o datos inválidos).");
+    }
+    
     Pausar();
-
 }
-
 
 
 private static void BorrarPlatoDesdeConsola(Restaurante restaurante)
-
 {
-
     Console.Clear();
+    Console.WriteLine($"\n-- BORRAR PLATO en el Menú de {restaurante.Nombre} --");
+    
+    // 1. Solicitamos el código del plato a borrar
+    Console.Write("Ingrese Código del plato a borrar: ");
+    string codigo = Console.ReadLine()?.Trim();
 
-    Console.WriteLine($"\n== BORRAR PLATO en {restaurante.Nombre} ==");
-
-
-
-    Console.Write("Código del plato a borrar: ");
-
-    string codigo = Console.ReadLine();
-
-
-
-    // Usa el borrado seguro (no permite borrar si hay pedidos pendientes que lo usan)
-
-    _gestorMenu.BorrarPlatoSeguro(restaurante.Nit, codigo);
-
+    // 2. Llamamos al GestorMenu para el borrado seguro
+    // La función BorrarPlatoSeguro valida si está en pedidos pendientes.
+    if (_gestorMenu.BorrarPlatoSeguro(restaurante.Nit, codigo))
+    {
+        Console.WriteLine($"\n¡Plato con código '{codigo}' eliminado con éxito!");
+    }
+    else
+    {
+        // El error específico (no existe o referenciado) lo muestra GestorMenu.cs
+        Console.WriteLine("\nOperación de borrado cancelada o fallida.");
+    }
+    
     Pausar();
-
 }
-
-
-
 
 
 private static void MenuGestionPedidos()
