@@ -1,8 +1,8 @@
-
 using System;
 
 public class GestorMenu
 {
+    //Guardamos una referencia al gestor principal para poder acceder a los restaurantes y sus menús
     private GestorPrincipal _gestorPrincipal;
     
     public GestorMenu(GestorPrincipal gestorPrincipal)
@@ -10,7 +10,7 @@ public class GestorMenu
         _gestorPrincipal = gestorPrincipal;
     }
 
-    
+    // Método para borrar un plato de manera segura, verificando que no esté referenciado en pedidos pendientes
     public bool BorrarPlatoSeguro(string nitRestaurante, string codigoPlato)
     {
         var restaurante = _gestorPrincipal.ObtenerRestaurantePorNit(nitRestaurante);
@@ -43,24 +43,22 @@ public class GestorMenu
             return false;
         }
 
-       
         if (EstaReferenciadoEnPedidosPendientes(restaurante, codigoPlato))
         {
             Console.WriteLine("¡Borrado Bloqueado! El plato está referenciado en pedidos PENDIENTES.");
             return false;
         }
 
-      
         restaurante.Menu.EliminarPosicion(posicion);
 
         Console.WriteLine($"Plato '{platoABorrar.Nombre}' borrado con éxito.");
         return true;
     }
     
+    // Método auxiliar para verificar si un plato está referenciado en pedidos pendientes
     private bool EstaReferenciadoEnPedidosPendientes(Restaurante restaurante, string codigoPlato)
     {
        
-        
         var nodoPedidoActual = restaurante.ColaPedidosPendientes.Cabeza; 
         
         while (nodoPedidoActual != null)
@@ -83,6 +81,7 @@ public class GestorMenu
         return false;
     }
 
+    // Método para listar los platos del menú de un restaurante
     public void ListarPlatos(Restaurante restaurante)
 {
     Console.Clear();
@@ -99,7 +98,7 @@ public class GestorMenu
     while (actual != null)
     {
         var p = actual.Valor;
-        // Asumiendo que Plato.ToString() o la impresión directa son suficientes
+
         Console.WriteLine($"{indice}. [{p.Codigo}] {p.Nombre} - ${p.Precio:N2}"); 
         Console.WriteLine($"   Descripción: {p.Descripcion}");
         actual = actual.Siguiente;
@@ -107,6 +106,7 @@ public class GestorMenu
     }
 }
 
+// Método para editar un plato del menú
 public bool EditarPlato(string nitRestaurante, string codigoPlato, string nuevoNombre, string nuevaDescripcion, decimal nuevoPrecio)
 {
     var restaurante = _gestorPrincipal.ObtenerRestaurantePorNit(nitRestaurante);
@@ -140,7 +140,6 @@ public bool EditarPlato(string nitRestaurante, string codigoPlato, string nuevoN
         return false;
     }
 
-    // 3. Aplicar cambios
     platoAEditar.Nombre = nuevoNombre;
     platoAEditar.Descripcion = nuevaDescripcion;
     platoAEditar.Precio = nuevoPrecio;
@@ -149,6 +148,7 @@ public bool EditarPlato(string nitRestaurante, string codigoPlato, string nuevoN
     return true;
 }
 
+// Método para crear un nuevo plato desde consola
 public void CrearPlatoDesdeConsola(Restaurante restaurante)
 {
     Console.Clear();
@@ -157,7 +157,6 @@ public void CrearPlatoDesdeConsola(Restaurante restaurante)
     Console.Write("Ingrese Código del plato (único): ");
     string codigo = Console.ReadLine()?.Trim();
     
-    // 1. Validar unicidad y que no esté vacío
     if (string.IsNullOrWhiteSpace(codigo) || ExistePlato(restaurante, codigo)) 
     {
         string mensaje = string.IsNullOrWhiteSpace(codigo) ? 
@@ -176,27 +175,26 @@ public void CrearPlatoDesdeConsola(Restaurante restaurante)
     Console.Write("Ingrese Precio del plato (debe ser > 0): ");
     string precioStr = Console.ReadLine()?.Trim();
 
-    // 2. Validar que el precio sea un número positivo
+    // Validar que el precio sea un número positivo
     if (!decimal.TryParse(precioStr, out decimal precio) || precio <= 0)
     {
         Console.WriteLine("Error de validación: El precio debe ser un número positivo (> 0).");
         return;
     }
 
-    // 3. Validación de nombre no vacío
     if (string.IsNullOrWhiteSpace(nombre))
     {
         Console.WriteLine("Error: El nombre del plato no puede estar vacío.");
         return;
     }
     
-    // 4. Creación y adición
     var nuevoPlato = new Plato(codigo, nombre, descripcion, precio);
-    restaurante.Menu.Agregar(nuevoPlato); // Agregar a la ListaEnlazada<Plato> del restaurante
+    restaurante.Menu.Agregar(nuevoPlato); 
 
     Console.WriteLine($"Plato '{nombre}' creado y agregado al menú con éxito.");
 }
 
+// Método para verificar si un plato con el código dado ya existe en el menú
 public bool ExistePlato(Restaurante restaurante, string codigo)
 {
     var actual = restaurante.Menu.Cabeza;

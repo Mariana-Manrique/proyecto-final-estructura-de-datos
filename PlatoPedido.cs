@@ -1,14 +1,16 @@
-//namespace Listas.Dominio;
+using System;
 
 public class PlatoPedido
 {
-    // Atributos clave
-    public string CodigoPlato { get; set; } // [cite: 33]
-    public int Cantidad { get; set; } // [cite: 33] (Regla: > 0) [cite: 33]
-    public decimal PrecioUnitario { get; set; } // [cite: 33]
+    // Propiedades del plato en el pedido
+    public string CodigoPlato { get; set; } 
+    public int Cantidad { get; set; } 
+    public decimal PrecioUnitario { get; set; } 
 
+    // Propiedad calculada para el subtotal
     public decimal Subtotal => Cantidad * PrecioUnitario;
 
+    // Constructor del plato en el pedido
     public PlatoPedido(string codigoPlato, int cantidad, decimal precioUnitario)
     {
         CodigoPlato = codigoPlato;
@@ -16,6 +18,7 @@ public class PlatoPedido
         PrecioUnitario = precioUnitario;
     }
     
+    // Método para representar el plato en el pedido como una cadena de texto
     public override string ToString()
     {
         return $"- {Cantidad}x Plato '{CodigoPlato}' @ ${PrecioUnitario:N2} = ${Subtotal:N2}";

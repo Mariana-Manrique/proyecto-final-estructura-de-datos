@@ -1,25 +1,24 @@
-//namespace Listas.Dominio;
-
 using System;
 
 public class Restaurante
 {
-    // Atributos clave
-    public string Nit { get; set; } // Único [cite: 18, 19]
-    public string Nombre { get; set; } // [cite: 18]
-    public string Dueno { get; set; } // [cite: 18]
-    public string Celular { get; set; } // 10 dígitos [cite: 18, 19]
-    public string Direccion { get; set; } // [cite: 18]
+    // Propiedades del restaurante
+    public string Nit { get; set; } 
+    public string Nombre { get; set; } 
+    public string Dueno { get; set; } 
+    public string Celular { get; set; } 
+    public string Direccion { get; set; } 
 
-    // Estructuras de datos para la lógica central
-    public ListaEnlazada<Cliente> Clientes { get; set; } // [cite: 10]
-    public ListaEnlazada<Plato> Menu { get; set; } // [cite: 10]
-    public Cola<Pedido> ColaPedidosPendientes { get;  set; } // Cola de pedidos pendientes [cite: 11]
-    public Pila<Plato> HistorialPlatosServidos { get;  set; } // Pila para historial [cite: 12]
+    // Estructuras de datos asociadas al restaurante
+    public ListaEnlazada<Cliente> Clientes { get; set; } 
+    public ListaEnlazada<Plato> Menu { get; set; } 
+    public Cola<Pedido> ColaPedidosPendientes { get;  set; } 
+    public Pila<Plato> HistorialPlatosServidos { get;  set; } 
 
-    // Variable para las ganancias del día
+    // Ganancias del día
     public decimal GananciasDelDia { get; set; }
 
+    // Constructor del restaurante
     public Restaurante(string nit, string nombre, string dueno, string celular, string direccion)
     {
         Nit = nit;
@@ -28,7 +27,6 @@ public class Restaurante
         Celular = celular;
         Direccion = direccion;
         
-        // Inicialización de las estructuras de datos
         Clientes = new ListaEnlazada<Cliente>();
         Menu = new ListaEnlazada<Plato>();
         ColaPedidosPendientes = new Cola<Pedido>();
@@ -36,10 +34,10 @@ public class Restaurante
         GananciasDelDia = 0;
     }
 
-    //[cite_start]// Método llamado al despachar un pedido (RF-06) [cite: 58]
+    // Método para sumar ganancias del día
     public void SumarGanancia(decimal monto)
     {
-        GananciasDelDia += monto; // [cite: 50]
+        GananciasDelDia += monto; 
     }
     
     public override string ToString()

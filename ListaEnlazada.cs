@@ -1,5 +1,3 @@
-//namespace Listas;
-
 using System;
 
 public class ListaEnlazada<T> {
@@ -156,7 +154,7 @@ public class ListaEnlazada<T> {
         actual.Siguiente = nuevoNodo;
     }
     
-// EN ListaEnlazada.cs
+
 public bool EliminarPorValor(T valor)
 {
     if (cabeza == null)
@@ -164,40 +162,38 @@ public bool EliminarPorValor(T valor)
         return false;
     }
 
-    // Caso 1: El nodo a borrar es la cabeza
     if (cabeza.Valor.Equals(valor)) 
     {
         cabeza = cabeza.Siguiente;
-        if (cabeza == null) ultimo = null; // Si se queda vacía
+        if (cabeza == null) ultimo = null; 
         cantidad--;
         return true;
     }
 
-    // Caso 2: Buscar en el resto de la lista
     Nodo<T> actual = cabeza;
     while (actual.Siguiente != null)
     {
         if (actual.Siguiente.Valor.Equals(valor))
         {
             actual.Siguiente = actual.Siguiente.Siguiente;
-            if (actual.Siguiente == null) ultimo = actual; // Si se borra el último
+            if (actual.Siguiente == null) ultimo = actual; 
             cantidad--;
             return true;
         }
         actual = actual.Siguiente;
     }
 
-    return false; // No se encontró el valor
+    return false; 
 }
 
 public void Recorrer(Action<T> accion)
 {
-    Nodo<T> actual = cabeza; // Asumo que 'cabeza' es el primer nodo (puede ser 'this.cabeza' si es privado)
+    Nodo<T> actual = cabeza; 
     while (actual != null)
     {
-        // Ejecuta la función (lambda) que se pasó como argumento (la que imprime en Console.WriteLine)
+        
         accion(actual.Valor); 
-        actual = actual.Siguiente; // Mueve al siguiente nodo
+        actual = actual.Siguiente; 
     }
 }
 }

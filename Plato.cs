@@ -1,15 +1,14 @@
-//namespace Listas.Dominio;
-
 using System;
-//esta es la clase plato que contiene los atributos y metodos necesarios para manejar los platos del menu
+
 public class Plato
 {
-    // Atributos clave
-    public string Codigo { get; set; } // [cite: 24]
-    public string Nombre { get; set; } // [cite: 24]
-    public string Descripcion { get; set; } // [cite: 24]
-    public decimal Precio { get; set; } // [cite: 24] (Regla: > 0) [cite: 25]
+    // Propiedades del plato
+    public string Codigo { get; set; } 
+    public string Nombre { get; set; } 
+    public string Descripcion { get; set; } 
+    public decimal Precio { get; set; } 
 
+    // Constructor del plato
     public Plato(string codigo, string nombre, string descripcion, decimal precio)
     {
         Codigo = codigo;

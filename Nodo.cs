@@ -1,10 +1,9 @@
-//namespace Listas;
 using System;
 public class Nodo<T> {
     private T valor;
     private Nodo<T> siguiente;
 
-//constructor
+
     public Nodo(T valor)
     {
         this.valor = valor;

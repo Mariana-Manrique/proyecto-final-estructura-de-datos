@@ -2,89 +2,85 @@ using System;
 
 public class GestorPedidos
 {
-    private GestorPrincipal _gestorPrincipal; // Atributo que guarda una referencia al gestor principal del sistema, para acceder a restaurantes y otros datos.
+    //Guardamos una referencia al gestor principal para poder acceder a los restaurantes y sus pedidos
+    private GestorPrincipal _gestorPrincipal; 
     
     public GestorPedidos(GestorPrincipal gestorPrincipal)
     {
-        _gestorPrincipal = gestorPrincipal; // Se inicializa el gestor principal que será usado por esta clase.
+        _gestorPrincipal = gestorPrincipal; 
     }
 
+    // Método para tomar y confirmar un nuevo pedido
     public bool TomarYConfirmarPedido(string nitRestaurante, string cedulaCliente, ListaEnlazada<PlatoPedido> itemsPedido)
     {
-        var restaurante = _gestorPrincipal.ObtenerRestaurantePorNit(nitRestaurante); // Buscamos el restaurante usando el NIT.
+        var restaurante = _gestorPrincipal.ObtenerRestaurantePorNit(nitRestaurante); 
         if (restaurante == null)
         {
-            Console.WriteLine("Error: Restaurante no encontrado."); // Mensaje si el restaurante no existe.
+            Console.WriteLine("Error: Restaurante no encontrado."); 
             return false;
         }
 
-        var cliente = ObtenerCliente(restaurante, cedulaCliente); // Buscamos el cliente dentro del restaurante.
+        var cliente = ObtenerCliente(restaurante, cedulaCliente); 
         if (cliente == null)
         {
-            Console.WriteLine("Error: Cliente no registrado."); // Si no existe, se informa.
+            Console.WriteLine("Error: Cliente no registrado."); 
             return false;
         }
 
-        var nuevoPedido = new Pedido(cedulaCliente); // Se crea un nuevo pedido asociado al cliente.
-        
-        var actualItem = itemsPedido.Cabeza; // Se inicia el recorrido por la lista de platos del pedido.
+        var nuevoPedido = new Pedido(cedulaCliente); 
+        var actualItem = itemsPedido.Cabeza; 
         while (actualItem != null)
         {
-            // Agregamos cada elemento (plato pedido) al pedido que estamos formando.
             nuevoPedido.Platos.Agregar(actualItem.Valor);
-            actualItem = actualItem.Siguiente; // Avanzamos al siguiente nodo de la lista.
+            actualItem = actualItem.Siguiente; 
         }
 
-        nuevoPedido.CalcularTotal();  // Calculamos el total del pedido una vez agregados los platos.
+        nuevoPedido.CalcularTotal();  
+        restaurante.ColaPedidosPendientes.Agregar(nuevoPedido); 
+        cliente.HistorialPedidos.Agregar(nuevoPedido); 
         
-        restaurante.ColaPedidosPendientes.Agregar(nuevoPedido); // Se agrega el pedido a la cola de pedidos pendientes del restaurante.
-        
-        cliente.HistorialPedidos.Agregar(nuevoPedido); // Guardamos el pedido en el historial del cliente.
-        
-        Console.WriteLine($"Pedido #{nuevoPedido.IdPedido} confirmado y encolado. Total: ${nuevoPedido.Total:N2}"); // Confirmación en pantalla.
+        Console.WriteLine($"Pedido #{nuevoPedido.IdPedido} confirmado y encolado. Total: ${nuevoPedido.Total:N2}"); 
         return true;
     }
     
+    // Método auxiliar para obtener un cliente por su cédula
     private Cliente ObtenerCliente(Restaurante restaurante, string cedula)
     {
-        var actual = restaurante.Clientes.Cabeza; // Iniciamos recorrido por la lista de clientes del restaurante.
+        var actual = restaurante.Clientes.Cabeza; 
         while (actual != null)
         {
-            if (actual.Valor.Cedula == cedula) // Si encontramos coincidencia por cédula...
+            if (actual.Valor.Cedula == cedula) 
             {
-                return actual.Valor; // Devolvemos el cliente encontrado.
+                return actual.Valor; 
             }
-            actual = actual.Siguiente; // Continuamos recorriendo la lista.
+            actual = actual.Siguiente; 
         }
-        return null; // Si no se encontró el cliente, retornamos null.
+        return null; 
     }
 
-
-    
+    // Método para despachar el siguiente pedido del cliente en la cola
     public bool DespacharSiguientePedido(string nitRestaurante)
     {
-        var restaurante = _gestorPrincipal.ObtenerRestaurantePorNit(nitRestaurante); // Buscamos el restaurante.
+        var restaurante = _gestorPrincipal.ObtenerRestaurantePorNit(nitRestaurante); 
         if (restaurante == null)
         {
             Console.WriteLine("Error: Restaurante no encontrado.");
             return false;
         }
         
-       if (restaurante.ColaPedidosPendientes.EstaVacia())  // Revisamos si hay pedidos en espera.
+       if (restaurante.ColaPedidosPendientes.EstaVacia())  
         {
             Console.WriteLine("La cola de pedidos está vacía. No hay nada que despachar.");
             return false;
         }
 
+        var pedidoADespachar = restaurante.ColaPedidosPendientes.Primero(); 
+        restaurante.ColaPedidosPendientes.Eliminar(); 
         
-        var pedidoADespachar = restaurante.ColaPedidosPendientes.Primero(); // Obtenemos el primer pedido en la cola.
-        restaurante.ColaPedidosPendientes.Eliminar(); // Lo eliminamos de la cola porque ya será despachado.
-        
-        pedidoADespachar.Estado = Pedido.ESTADO_DESPACHADO;  // Cambiamos su estado a despachado.
+        pedidoADespachar.Estado = Pedido.ESTADO_DESPACHADO;  
+        restaurante.SumarGanancia(pedidoADespachar.Total);  
 
-        restaurante.SumarGanancia(pedidoADespachar.Total);  // Sumamos el valor del pedido a las ganancias del día.
-
-        var actualPlatoPedido = pedidoADespachar.Platos.Cabeza; // Recorremos los platos del pedido.
+        var actualPlatoPedido = pedidoADespachar.Platos.Cabeza; 
         while (actualPlatoPedido != null)
         {
             // Buscamos la información del plato en el menú del restaurante.
@@ -97,50 +93,52 @@ public class GestorPedidos
                     restaurante.HistorialPlatosServidos.AgregarElemento(plato);
                 }
             }
-
-            actualPlatoPedido = actualPlatoPedido.Siguiente; // Avanzamos en la lista.
+            actualPlatoPedido = actualPlatoPedido.Siguiente; 
         }
 
         Console.WriteLine($"Pedido #{pedidoADespachar.IdPedido} DESPACHADO. Ganancia sumada: ${pedidoADespachar.Total:N2}"); // Mensaje final.
         return true;
     }
     
+    // Método auxiliar para obtener un plato por su código
     private Plato ObtenerPlato(Restaurante restaurante, string codigo)
     {
-        var actual = restaurante.Menu.Cabeza; // Recorremos la lista de platos del menú.
+        var actual = restaurante.Menu.Cabeza; 
         while (actual != null)
         {
-            if (actual.Valor.Codigo == codigo) // Si el código coincide...
+            if (actual.Valor.Codigo == codigo) 
             {
-                return actual.Valor; // Devolvemos el plato.
+                return actual.Valor; 
             }
-            actual = actual.Siguiente; // Continuamos buscando.
+            actual = actual.Siguiente; 
         }
-        return null; // Si no se encontró el plato.
+        return null; 
     }
     
+    // Método para generar un reporte de ganancias del día
     public void ReporteGananciasDelDia(string nitRestaurante)
     {
-        var restaurante = _gestorPrincipal.ObtenerRestaurantePorNit(nitRestaurante); // Buscamos el restaurante.
+        var restaurante = _gestorPrincipal.ObtenerRestaurantePorNit(nitRestaurante); 
         if (restaurante == null)
         {
             Console.WriteLine("Error: Restaurante no encontrado.");
             return;
         }
-        Console.WriteLine($"Ganancias totales del día para {restaurante.Nombre}: ${restaurante.GananciasDelDia:N2}"); // Mostramos total ganado.
+        Console.WriteLine($"Ganancias totales del día para {restaurante.Nombre}: ${restaurante.GananciasDelDia:N2}"); 
     }
     
+    // Método para generar un reporte de platos servidos recientemente
     public void ReportePlatosServidosRecientes(string nitRestaurante)
     {
-        var restaurante = _gestorPrincipal.ObtenerRestaurantePorNit(nitRestaurante); // Buscamos restaurante.
+        var restaurante = _gestorPrincipal.ObtenerRestaurantePorNit(nitRestaurante); 
         if (restaurante == null)
         {
             Console.WriteLine("Error: Restaurante no encontrado.");
             return;
         }
         
-        Console.WriteLine($"Platos Servidos Recientemente ({restaurante.HistorialPlatosServidos.Tamano} ítems):"); // Encabezado del reporte.
-        restaurante.HistorialPlatosServidos.ImprimirPila(); // Se imprime la pila de platos servidos.
+        Console.WriteLine($"Platos Servidos Recientemente ({restaurante.HistorialPlatosServidos.Tamano} ítems):"); 
+        restaurante.HistorialPlatosServidos.ImprimirPila(); 
     }
 
 
