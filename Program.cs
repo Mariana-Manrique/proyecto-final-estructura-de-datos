@@ -509,16 +509,15 @@ private static void MenuClientes(Restaurante restaurante)
 {
 
     bool regresar = false;
-
     while (!regresar)
 
     {
 
         Console.WriteLine("\n-- Gestión de Clientes --");
-
         Console.WriteLine("1. Crear Cliente");
-
         Console.WriteLine("2. Listar Clientes");
+        Console.WriteLine("3. Editar Cliente");
+        Console.WriteLine("4. Borrar Cliente");
 
         Console.WriteLine("0. Regresar");
 
@@ -742,13 +741,11 @@ private static void MenuPlatos(Restaurante restaurante)
     {
 
         Console.WriteLine("\n-- Gestión de Platos --");
-
         Console.WriteLine("1. Crear Plato");
-
         Console.WriteLine("2. Listar Platos");
-
+        Console.WriteLine("3. Editar Plato");
+        Console.WriteLine("4. Borrar Plato");
         Console.WriteLine("0. Regresar");
-
         Console.Write("Seleccione opción: ");
 
 
